@@ -1,0 +1,258 @@
+:root {
+  color: #182026;
+  background: #f4f7f5;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 1px solid #12322d;
+  border-radius: 6px;
+  background: #12322d;
+  color: #ffffff;
+  min-height: 42px;
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #1c463f;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.intro-band,
+.response-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 32px clamp(20px, 5vw, 64px);
+  background: #ffffff;
+  border-bottom: 1px solid #d9e1dd;
+}
+
+.intro-band h1,
+.response-band h2,
+.panel h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.intro-band h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #5f6b66;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-pill,
+.http-status {
+  border: 1px solid #cbd6d1;
+  border-radius: 999px;
+  color: #596861;
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 8px 12px;
+}
+
+.status-pill.active,
+.http-status.ok {
+  border-color: #28745f;
+  color: #17624d;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  padding: 24px clamp(20px, 5vw, 64px);
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #d9e1dd;
+  border-radius: 8px;
+  padding: 22px;
+}
+
+.panel h2 {
+  font-size: 1.2rem;
+  margin-bottom: 18px;
+}
+
+label {
+  color: #46524d;
+  display: grid;
+  font-size: 0.92rem;
+  font-weight: 700;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.field-note {
+  color: #64716b;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  margin: -8px 0 16px;
+}
+
+input {
+  border: 1px solid #bdc9c4;
+  border-radius: 6px;
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, #12322d 50%) calc(100% - 18px) 18px / 6px 6px no-repeat,
+    linear-gradient(135deg, #12322d 50%, transparent 50%) calc(100% - 12px) 18px / 6px 6px no-repeat,
+    #ffffff;
+  border: 1px solid #bdc9c4;
+  border-radius: 6px;
+  min-height: 42px;
+  padding: 0 36px 0 12px;
+}
+
+input:focus,
+select:focus {
+  border-color: #17624d;
+  outline: 3px solid rgba(23, 98, 77, 0.14);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.security-actions button:last-child {
+  background: #ffffff;
+  color: #12322d;
+}
+
+.token-box {
+  border: 1px solid #d9e1dd;
+  border-radius: 8px;
+  margin-top: 22px;
+  overflow: hidden;
+}
+
+.token-header {
+  align-items: center;
+  background: #f0f4f2;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  color: #46524d;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.token-box code {
+  display: block;
+  min-height: 96px;
+  overflow-wrap: anywhere;
+  padding: 14px;
+  white-space: pre-wrap;
+}
+
+.claims-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.claims-grid div {
+  border: 1px solid #d9e1dd;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.claims-grid span {
+  color: #65736d;
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.claims-grid strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.role-tests {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.response-band {
+  align-items: flex-start;
+  border-bottom: 0;
+  border-top: 1px solid #d9e1dd;
+  flex-wrap: wrap;
+}
+
+.response-band pre {
+  background: #182026;
+  border-radius: 8px;
+  color: #f5fbf8;
+  flex-basis: 100%;
+  line-height: 1.45;
+  margin: 0;
+  min-height: 140px;
+  overflow: auto;
+  padding: 16px;
+}
+
+@media (max-width: 820px) {
+  .intro-band,
+  .response-band {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .workspace-grid,
+  .claims-grid {
+    grid-template-columns: 1fr;
+  }
+}

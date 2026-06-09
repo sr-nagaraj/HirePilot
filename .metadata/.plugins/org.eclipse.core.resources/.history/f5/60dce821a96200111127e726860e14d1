@@ -1,0 +1,5 @@
+package com.hirepilot.rest.controller;
+
+public class greetAPI {
+
+}
