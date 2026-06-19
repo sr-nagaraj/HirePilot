@@ -9,6 +9,7 @@ import com.hirepilot.job.exception.JobAlreadyAppliedException;
 import com.hirepilot.job.exception.ResourceNotFoundException;
 
 import com.hirepilot.job.repository.JobApplicationRepository;
+import com.hirepilot.job.repository.JobRepository;
 import com.hirepilot.job.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,9 @@ import java.util.List;
 public class ApplicationServiceImpl
         implements ApplicationService {
 
-
-
-
-    private final JobApplicationRepository
-            applicationRepository;
+    private final JobApplicationRepository applicationRepository;
+    private final JobRepository jobRepository;
+    private final com.hirepilot.job.client.UserServiceClient userServiceClient;
 
     @Override
     public ApplicationResponse applyJob(
@@ -115,6 +114,33 @@ public class ApplicationServiceImpl
     private ApplicationResponse mapToResponse(
             JobApplication application
     ) {
+        String jobTitle = "Job Deleted By Recruiter";
+        String companyName = null;
+        Boolean jobDeleted = true;
+
+        var jobOpt = jobRepository.findById(application.getJobId());
+        if (jobOpt.isPresent()) {
+            var job = jobOpt.get();
+            if (job.getDeleted() != null && job.getDeleted()) {
+                jobTitle = "Job Deleted By Recruiter";
+                companyName = null;
+                jobDeleted = true;
+            } else {
+                jobTitle = job.getTitle();
+                companyName = job.getCompany();
+                jobDeleted = false;
+            }
+        }
+
+        String candidateName = "Candidate #" + application.getCandidateId();
+        try {
+            var profile = userServiceClient.getProfileByUserId(application.getCandidateId());
+            if (profile != null && profile.getFullName() != null) {
+                candidateName = profile.getFullName();
+            }
+        } catch (Exception e) {
+            // Ignore/fallback to default
+        }
 
         return ApplicationResponse.builder()
                 .id(application.getId())
@@ -127,6 +153,10 @@ public class ApplicationServiceImpl
                 .appliedAt(
                         application.getAppliedAt()
                 )
+                .jobTitle(jobTitle)
+                .companyName(companyName)
+                .jobDeleted(jobDeleted)
+                .candidateName(candidateName)
                 .build();
     }
 }

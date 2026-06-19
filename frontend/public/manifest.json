@@ -1,0 +1,21 @@
+{
+  "name": "HirePilot | AI Powered Hiring Platform",
+  "short_name": "HirePilot",
+  "description": "HirePilot is an AI-powered recruitment platform for smarter candidate screening, resume analysis, and hiring automation.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#1163ff",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

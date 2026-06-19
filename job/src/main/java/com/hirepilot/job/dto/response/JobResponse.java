@@ -33,5 +33,7 @@ public class JobResponse {
 
     private JobStatus status;
 
+    private Boolean deleted;
+
     private LocalDateTime createdAt;
 }

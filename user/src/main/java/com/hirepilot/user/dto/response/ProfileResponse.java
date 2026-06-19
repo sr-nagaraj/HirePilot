@@ -31,7 +31,13 @@ public class ProfileResponse {
 
     private String githubUrl;
 
+    private String education;
     private String websiteUrl;
+
+    private String location;
+
+    private String phoneNumber;
+
 
     private String profilePicture;
 }

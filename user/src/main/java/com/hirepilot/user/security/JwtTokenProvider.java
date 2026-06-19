@@ -10,6 +10,8 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtTokenProvider {
 
+
+
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)
@@ -18,8 +20,8 @@ public class JwtTokenProvider {
                 .getPayload();
     }
     public Long getUserId(String token) {
-        return getClaims(token)
-                .get("userId", Long.class);
+        Number userId = getClaims(token).get("userId", Number.class);
+        return userId != null ? userId.longValue() : null;
     }
 
     public String getRole(String token) {
@@ -33,11 +35,15 @@ public class JwtTokenProvider {
 
 
 
-    private static final String SECRET_KEY =
-            "mySuperSecretKeyForJwtAuthentication123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    @org.springframework.beans.factory.annotation.Value("${app.jwt.secret}")
+    private String secretKey;
 
-    private final SecretKey key =
-            Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private SecretKey key;
+
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
 
 
     public boolean validateToken(String token) {

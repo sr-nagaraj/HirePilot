@@ -6,17 +6,15 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/hirepilot_user
-    username: root
-    password: Root@123
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
-
     show-sql: true
-
     properties:
       hibernate:
         format_sql: true
@@ -27,6 +25,49 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+# Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# File storage (adjust path to match your OS)
+file:
+  upload-dir: C:\DCMI\user\uploads\resumes
+
+# OpenAI
+openai:
+  api-key: ${OPENAI_API_KEY}         # <-- set this as env variable, never hardcode
+  model: gpt-4.1-mini
+  max-tokens: 1000
+  temperature: 0.2
+  timeout-seconds: 30
+  max-text-chars: 12000
+  prompt-template: |
+    You are an ATS (Applicant Tracking System) expert.
+    Analyze the resume against the job description and return ONLY a JSON object.
+    No markdown, no explanation, no backticks. Pure JSON only.
+
+    Schema:
+    {
+      "overallScore": <0-100>,
+      "skillsMatch": <0-100>,
+      "experienceMatch": <0-100>,
+      "educationMatch": <0-100>,
+      "missingSkills": ["..."],
+      "strengths": ["..."],
+      "suggestions": ["..."],
+      "recommendation": "<Excellent Match|Good Match|Moderate Match|Poor Match>"
+    }
+
+    JOB DESCRIPTION:
+    {jobDescription}
+
+    RESUME TEXT:
+    {resumeText}
+
 logging:
   level:
     org.springframework.security: DEBUG
@@ -34,6 +75,9 @@ logging:
 springdoc:
   api-docs:
     path: /v3/api-docs
-
   swagger-ui:
     path: /swagger-ui.html
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:mySuperSecretKeyForJwtAuthentication123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ}

@@ -43,14 +43,17 @@ public class JwtAuthenticationFilter
             System.out.println("Token: " + token);
 
             if (jwtTokenProvider.validateToken(token)) {
-
-                email = jwtTokenProvider.getEmailFromToken(token);
-                userId = jwtTokenProvider.getUserId(token);
-                role = jwtTokenProvider.getRole(token);
-
-                System.out.println("Email = " + email);
-                System.out.println("UserId = " + userId);
-                System.out.println("Role = " + role);
+                try {
+                    email = jwtTokenProvider.getEmailFromToken(token);
+                    userId = jwtTokenProvider.getUserId(token);
+                    role = jwtTokenProvider.getRole(token);
+                    System.out.println("Email = " + email);
+                    System.out.println("UserId = " + userId);
+                    System.out.println("Role = " + role);
+                } catch (Exception e) {
+                    System.out.println("FILTER ERROR: " + e.getMessage());
+                    e.printStackTrace();  // ← this will show exact failure
+                }
             }
         }
 

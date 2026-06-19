@@ -1,0 +1,11 @@
+# Override Eureka to Docker hostname
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Override file upload path for Linux container
+file:
+  upload-dir: /app/uploads/resumes

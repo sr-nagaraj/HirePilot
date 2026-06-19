@@ -1,0 +1,49 @@
+# Override Eureka to Docker hostname
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Override gateway routes: localhost → Docker service names
+spring:
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: auth-service
+              uri: http://auth-service:8081
+              predicates:
+                - Path=/api/auth/**
+
+            - id: oauth2-route
+              uri: http://auth-service:8081
+              predicates:
+                - Path=/oauth2/**
+
+            - id: login-route
+              uri: http://auth-service:8081
+              predicates:
+                - Path=/login/**
+
+            - id: user-service
+              uri: http://user-service:8082
+              predicates:
+                - Path=/api/profile/**
+
+            - id: user-uploads
+              uri: http://user-service:8082
+              predicates:
+                - Path=/uploads/**
+
+            - id: resume-service
+              uri: http://user-service:8082
+              predicates:
+                - Path=/api/resumes/**
+
+            - id: job-service
+              uri: http://job-service:8083
+              predicates:
+                - Path=/api/jobs/**,/api/applications/**

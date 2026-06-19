@@ -10,13 +10,17 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtTokenProvider {
 
-    private static final String SECRET_KEY =
-            "mySuperSecretKeyForJwtAuthentication123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    @org.springframework.beans.factory.annotation.Value("${app.jwt.secret}")
+    private String secretKey;
 
-    private final SecretKey key =
-            Keys.hmacShaKeyFor(
-                    SECRET_KEY.getBytes()
-            );
+    private SecretKey key;
+
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(
+                secretKey.getBytes()
+        );
+    }
 
     private Claims getClaims(String token) {
 

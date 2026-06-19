@@ -1,5 +1,6 @@
 package com.hirepilot.auth.entity;
 
+import com.hirepilot.auth.enums.AuthProvider;
 import com.hirepilot.auth.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,8 +46,10 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicture;
 
-    @Column(name = "auth_provider", length = 50)
-    private String provider;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", nullable = false)
+    private AuthProvider authProvider;
+
 
     @Column(nullable = false)
     @Builder.Default
@@ -59,4 +62,5 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
 }

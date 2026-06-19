@@ -22,5 +22,13 @@ public class ApplicationResponse {
 
     private ApplicationStatus status;
 
+    private String jobTitle;
+
+    private String companyName;
+
+    private Boolean jobDeleted;
+
     private LocalDateTime appliedAt;
+
+    private String candidateName;
 }

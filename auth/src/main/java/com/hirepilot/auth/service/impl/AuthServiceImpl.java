@@ -1,10 +1,12 @@
 package com.hirepilot.auth.service.impl;
 
 import com.hirepilot.auth.dto.request.LoginRequest;
+import com.hirepilot.auth.dto.request.OAuthRoleRequest;
 import com.hirepilot.auth.dto.request.RegisterRequest;
+import com.hirepilot.auth.dto.request.ResetPasswordRequest;
 import com.hirepilot.auth.dto.response.AuthResponse;
 import com.hirepilot.auth.entity.User;
-import com.hirepilot.auth.enums.Role;
+import com.hirepilot.auth.enums.AuthProvider;
 import com.hirepilot.auth.exception.InvalidCredentialsException;
 import com.hirepilot.auth.exception.UserAlreadyExistsException;
 import com.hirepilot.auth.repository.UserRepository;
@@ -14,9 +16,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
+    private final OTPService otpService;
 
     private final UserRepository userRepository;
 
@@ -42,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
                         )
                 )
                 .role(request.getRole())
+                .authProvider(AuthProvider.LOCAL)
                 .build();
 
         userRepository.save(savedUser);
@@ -58,7 +65,70 @@ public class AuthServiceImpl implements AuthService {
                 .role(savedUser.getRole())
                 .message("User registered successfully")
                 .build();
+
+
     }
+
+
+
+    @Override
+    public void sendOtp(
+            String email
+    ) {
+        otpService.sendOtp(email);
+    }
+
+    @Override
+    public AuthResponse completeOAuth(
+            OAuthRoleRequest request
+    ) {
+
+        User user =
+                userRepository.findByEmail(
+                        request.getEmail()
+                ).orElseGet(() -> {
+
+                    User newUser =
+                            User.builder()
+                                    .fullName(
+                                            request.getFullName()
+                                    )
+                                    .email(
+                                            request.getEmail()
+                                    )
+                                    .role(
+                                            request.getRole()
+                                    )
+                                    .authProvider(
+                                            AuthProvider.GOOGLE
+                                    )
+                                    .password(
+                                            UUID.randomUUID()
+                                                    .toString()
+                                    )
+                                    .build();
+
+                    return userRepository.save(
+                            newUser
+                    );
+                });
+
+        String token =
+                jwtTokenProvider.generateToken(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getRole().name()
+                );
+
+        return AuthResponse.builder()
+                .token(token)
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+    }
+
+
+
 
     @Override
     public AuthResponse login(LoginRequest request) {
@@ -81,6 +151,7 @@ public class AuthServiceImpl implements AuthService {
             );
         }
 
+
         String token =
                 jwtTokenProvider.generateToken(
                         user.getId(),
@@ -94,5 +165,58 @@ public class AuthServiceImpl implements AuthService {
                 .role(user.getRole())
                 .message("Login successful")
                 .build();
+    }
+
+    @Override
+    public void sendForgotPasswordOtp(
+            String email
+    ) {
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                ));
+
+        otpService.sendOtp(email);
+    }
+
+    @Override
+    public void resetPassword(
+            ResetPasswordRequest request
+    ) {
+
+        boolean verified =
+                otpService.verifyOtp(
+                        request.getEmail(),
+                        request.getOtp()
+                );
+
+        if (!verified) {
+
+            throw new RuntimeException(
+                    "Invalid OTP"
+            );
+        }
+
+        User user =
+                userRepository
+                        .findByEmail(
+                                request.getEmail()
+                        )
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                ));
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        userRepository.save(user);
     }
 }

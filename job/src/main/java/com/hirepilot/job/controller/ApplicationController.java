@@ -3,8 +3,10 @@ package com.hirepilot.job.controller;
 import com.hirepilot.job.dto.request.ApplyJobRequest;
 import com.hirepilot.job.dto.request.UpdateApplicationStatusRequest;
 import com.hirepilot.job.dto.response.ApplicationResponse;
+import com.hirepilot.job.dto.response.ApplicantDetailsResponse;
 import com.hirepilot.job.security.CustomUserDetails;
 import com.hirepilot.job.service.ApplicationService;
+import com.hirepilot.job.service.ApplicantEnrichmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.List;
 public class ApplicationController {
 
     private final ApplicationService applicationService;
+    private final ApplicantEnrichmentService applicantEnrichmentService;
 
     @PreAuthorize("hasRole('CANDIDATE')")
     @PostMapping("/api/jobs/{jobId}/apply")
@@ -98,6 +101,16 @@ public class ApplicationController {
                                 applicationId,
                                 request
                         )
+        );
+    }
+
+    @PreAuthorize("hasRole('RECRUITER')")
+    @GetMapping("/api/applications/job/{jobId}/applicants/details")
+    public ResponseEntity<List<ApplicantDetailsResponse>> getApplicantDetails(
+            @PathVariable Long jobId
+    ) {
+        return ResponseEntity.ok(
+                applicantEnrichmentService.getEnrichedApplicants(jobId)
         );
     }
 }

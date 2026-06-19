@@ -1,6 +1,7 @@
 package com.hirepilot.user.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -23,7 +24,7 @@ public class Profile {
     @Column(name = "user_id", nullable = false, unique = true)
     private Long userId;
 
-    @Column(name = "full_name", nullable = false)
+    @Column(name = "full_name")
     private String fullName;
 
     private String headline;
@@ -52,6 +53,19 @@ public class Profile {
 
     @Column(name = "profile_picture")
     private String profilePicture;
+
+    @Column(name = "location")
+    private String location;
+
+    @Column(name = "education")
+    private String education;
+
+    @Pattern(
+            regexp = "^$|^[0-9]{10,15}$",
+            message = "Phone number must contain only digits (10-15 digits)"
+    )
+    @Column(name = "phone_number",nullable = true)
+    private String phoneNumber;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

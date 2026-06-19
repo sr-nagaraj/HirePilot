@@ -1,0 +1,20 @@
+# Override Eureka to Docker hostname
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Fix OAuth2 redirect URI behind gateway/proxy
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: ${OAUTH_REDIRECT_URI:http://localhost:8080/login/oauth2/code/google}
+
+# OAuth2 success redirect to Docker frontend
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}

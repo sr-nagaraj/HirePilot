@@ -1,0 +1,183 @@
+version: "3.9"
+
+services:
+  # ════════════════════════════════════════════
+  #  INFRASTRUCTURE
+  # ════════════════════════════════════════════
+
+  mysql:
+    image: mysql:8.4
+    container_name: hirepilot-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    # Port mapping removed to ensure MySQL is internal only (not exposed to EC2 host)
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost",
+             "-uroot", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - hirepilot-net
+    restart: always
+
+  service-registry:
+    build:
+      context: ./service_registry
+      dockerfile: Dockerfile
+    image: hirepilot-eureka:latest
+    container_name: hirepilot-eureka
+    # Port mapping removed to keep service-registry internal only
+    healthcheck:
+      test: ["CMD-SHELL",
+             "wget -qO- http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    networks:
+      - hirepilot-net
+    restart: always
+
+  # ════════════════════════════════════════════
+  #  BACKEND SERVICES
+  # ════════════════════════════════════════════
+
+  auth-service:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    image: hirepilot-auth:latest
+    container_name: hirepilot-auth
+    # Port mapping removed to keep auth-service internal only
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_URL: jdbc:mysql://mysql:3306/hirepilot
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI}
+      FRONTEND_URL: ${FRONTEND_URL}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    networks:
+      - hirepilot-net
+    restart: always
+
+  user-service:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    image: hirepilot-user:latest
+    container_name: hirepilot-user
+    # Port mapping removed to keep user-service internal only
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_URL: jdbc:mysql://mysql:3306/hirepilot
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - user-uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    networks:
+      - hirepilot-net
+    restart: always
+
+  job-service:
+    build:
+      context: ./job
+      dockerfile: Dockerfile
+    image: hirepilot-job:latest
+    container_name: hirepilot-job
+    # Port mapping removed to keep job-service internal only
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_URL: jdbc:mysql://mysql:3306/hirepilot
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    networks:
+      - hirepilot-net
+    restart: always
+
+  apigateway:
+    build:
+      context: ./apigateway
+      dockerfile: Dockerfile
+    image: hirepilot-gateway:latest
+    container_name: hirepilot-gateway
+    ports:
+      - "8080:8080" # Exposed for ALB routing (api.hirepilotai.xyz)
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      job-service:
+        condition: service_started
+    networks:
+      - hirepilot-net
+    restart: always
+
+  # ════════════════════════════════════════════
+  #  FRONTEND
+  # ════════════════════════════════════════════
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://api.hirepilotai.xyz}
+    image: hirepilot-frontend:latest
+    container_name: hirepilot-frontend
+    ports:
+      - "3000:80" # Exposed for ALB routing (hirepilotai.xyz)
+    depends_on:
+      apigateway:
+        condition: service_started
+    networks:
+      - hirepilot-net
+    restart: always
+
+# ════════════════════════════════════════════
+#  VOLUMES & NETWORKS
+# ════════════════════════════════════════════
+volumes:
+  mysql-data:
+    driver: local
+  user-uploads:
+    driver: local
+
+networks:
+  hirepilot-net:
+    driver: bridge

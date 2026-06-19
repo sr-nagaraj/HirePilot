@@ -2,6 +2,7 @@ package com.hirepilot.user.service;
 
 import com.hirepilot.user.dto.request.UpdateProfileRequest;
 import com.hirepilot.user.dto.response.ProfileResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ProfileService {
 
@@ -10,5 +11,10 @@ public interface ProfileService {
     ProfileResponse updateProfile(
             Long userId,
             UpdateProfileRequest request
+    );
+
+    String uploadProfilePicture(
+            Long userId,
+            MultipartFile file
     );
 }

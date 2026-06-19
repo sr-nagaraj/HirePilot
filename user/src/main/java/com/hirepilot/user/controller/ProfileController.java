@@ -6,9 +6,11 @@ import com.hirepilot.user.security.CustomUserDetails;
 import com.hirepilot.user.service.ProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -37,6 +39,31 @@ public class ProfileController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @PostMapping(
+            value = "/picture",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<String> uploadProfilePicture(
+            @RequestParam("file") MultipartFile file,
+            Authentication authentication
+    ) {
+
+        CustomUserDetails user =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        String imagePath =
+                profileService.uploadProfilePicture(
+                        user.getUserId(),
+                        file
+                );
+
+        return ResponseEntity.ok(imagePath);
+    }
+
+
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<ProfileResponse> getProfileByUserId(
             @PathVariable Long userId

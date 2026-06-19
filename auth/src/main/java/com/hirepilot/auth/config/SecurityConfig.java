@@ -22,6 +22,11 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
+    private final OAuth2SuccessHandler
+            oAuth2SuccessHandler;
+
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http
@@ -45,11 +50,23 @@ public class SecurityConfig {
                                 )
                 )
 
+                .oauth2Login(oauth ->
+                        oauth
+                                .successHandler(
+                                        oAuth2SuccessHandler
+                                )
+                                .failureUrl(
+                                        "http://localhost:5173/oauth-success?error=oauth"
+                                )
+                )
+
                 .authorizeHttpRequests(
                         auth -> auth
 
                                 .requestMatchers(
                                         "/api/auth/**",
+                                        "/oauth2/**",
+                                        "/login/oauth2/**",
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**"
                                 )
@@ -69,11 +86,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
 
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(

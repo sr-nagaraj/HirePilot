@@ -16,10 +16,16 @@ public class CorsConfig {
         CorsConfiguration config =
                 new CorsConfiguration();
 
-        // Frontend URL
-        config.addAllowedOrigin(
-                "http://localhost:5173"
-        );
+        // Frontend URLs
+        String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+        if (allowedOrigins != null && !allowedOrigins.trim().isEmpty()) {
+            for (String origin : allowedOrigins.split(",")) {
+                config.addAllowedOrigin(origin.trim());
+            }
+        } else {
+            config.addAllowedOrigin("http://localhost:5173");
+            config.addAllowedOrigin("http://localhost:3000");
+        }
 
         // Allow all HTTP methods
         config.addAllowedMethod("*");

@@ -83,6 +83,7 @@ public class JobServiceImpl implements JobService {
     public ApiResponse deleteJob(Long recruiterId, Long jobId) {
 
         Job job = getOwnedJob(recruiterId, jobId);
+        job.setDeleted(true);
         job.setStatus(JobStatus.CLOSED);
         jobRepository.save(job);
 
@@ -99,7 +100,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobResponse> getAllJobs() {
-        return jobRepository.findByStatus(JobStatus.OPEN)
+        return jobRepository.findByStatusAndDeleted(JobStatus.OPEN, false)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -107,7 +108,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobResponse> getRecruiterJobs(Long recruiterId) {
-        return jobRepository.findByRecruiterId(recruiterId)
+        return jobRepository.findByRecruiterIdAndStatusAndDeleted(recruiterId, JobStatus.OPEN, false)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -144,6 +145,7 @@ public class JobServiceImpl implements JobService {
                 .salary(job.getSalary())
                 .description(job.getDescription())
                 .status(job.getStatus())
+                .deleted(job.getDeleted())
                 .createdAt(job.getCreatedAt())
                 .build();
     }

@@ -1,0 +1,179 @@
+version: "3.9"
+
+services:
+  # ════════════════════════════════════════════
+  #  INFRASTRUCTURE
+  # ════════════════════════════════════════════
+
+  mysql:
+    image: mysql:8.4
+    container_name: hirepilot-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost",
+             "-uroot", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - hirepilot-net
+    restart: on-failure
+
+  service-registry:
+    build:
+      context: ./service_registry
+      dockerfile: Dockerfile
+    container_name: hirepilot-eureka
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL",
+             "wget -qO- http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    networks:
+      - hirepilot-net
+    restart: on-failure
+
+  # ════════════════════════════════════════════
+  #  BACKEND SERVICES
+  # ════════════════════════════════════════════
+
+  auth-service:
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    container_name: hirepilot-auth
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_URL: jdbc:mysql://mysql:3306/hirepilot
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    networks:
+      - hirepilot-net
+    restart: on-failure
+
+  user-service:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    container_name: hirepilot-user
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_URL: jdbc:mysql://mysql:3306/hirepilot
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - user-uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+    networks:
+      - hirepilot-net
+    restart: on-failure
+
+  job-service:
+    build:
+      context: ./job
+      dockerfile: Dockerfile
+    container_name: hirepilot-job
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_URL: jdbc:mysql://mysql:3306/hirepilot
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    networks:
+      - hirepilot-net
+    restart: on-failure
+
+  apigateway:
+    build:
+      context: ./apigateway
+      dockerfile: Dockerfile
+    container_name: hirepilot-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      service-registry:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      job-service:
+        condition: service_started
+    networks:
+      - hirepilot-net
+    restart: on-failure
+
+  # ════════════════════════════════════════════
+  #  FRONTEND
+  # ════════════════════════════════════════════
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+    container_name: hirepilot-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      apigateway:
+        condition: service_started
+    networks:
+      - hirepilot-net
+    restart: on-failure
+
+# ════════════════════════════════════════════
+#  VOLUMES & NETWORKS
+# ════════════════════════════════════════════
+volumes:
+  mysql-data:
+    driver: local
+  user-uploads:
+    driver: local
+
+networks:
+  hirepilot-net:
+    driver: bridge

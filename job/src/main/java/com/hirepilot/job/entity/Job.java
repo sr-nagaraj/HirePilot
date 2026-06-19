@@ -52,6 +52,10 @@ public class Job {
     @Builder.Default
     private JobStatus status = JobStatus.OPEN;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean deleted = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

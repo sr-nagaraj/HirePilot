@@ -8,16 +8,23 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
+
 @Component
 public class JwtTokenProvider {
 
-    private static final String SECRET_KEY =
-            "mySuperSecretKeyForJwtAuthentication123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    @Value("${app.jwt.secret}")
+    private String secretKey;
 
-    private final SecretKey key =
-            Keys.hmacShaKeyFor(
-                    SECRET_KEY.getBytes()
-            );
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(
+                secretKey.getBytes()
+        );
+    }
 
     public String generateToken(
             Long userId,
@@ -28,6 +35,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(email)
 
+
                 .claim("userId", userId)
                 .claim("role", role)
 
@@ -36,7 +44,7 @@ public class JwtTokenProvider {
                 .expiration(
                         new Date(
                                 System.currentTimeMillis()
-                                        + 86400000
+                                        + 604800000L // 1 week
                         )
                 )
 

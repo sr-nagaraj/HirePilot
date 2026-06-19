@@ -1,5 +1,6 @@
 package com.hirepilot.user.dto.request;
 
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -30,6 +31,17 @@ public class UpdateProfileRequest {
     private String githubUrl;
 
     private String websiteUrl;
+
+    private String education;
+
+
+    private String location;
+
+    @Pattern(
+            regexp = "^$|^[0-9]{10,15}$",
+            message = "Phone number must contain only digits (10-15 digits)"
+    )
+    private String phoneNumber;
 
     private String profilePicture;
 }

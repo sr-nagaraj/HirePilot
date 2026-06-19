@@ -11,7 +11,7 @@ public class AppConstants {
 
     public static final String ROLE_PREFIX = "ROLE_";
 
-    public static final long JWT_EXPIRATION = 86400000;
+    public static final long JWT_EXPIRATION = 604800000;
 
     public static final String DEFAULT_PAGE_NUMBER = "0";
 
