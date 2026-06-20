@@ -13,9 +13,10 @@ import type { JobFiltersState } from "../types/jobs";
 interface JobFiltersProps {
   filters: JobFiltersState;
   onChange: (filters: JobFiltersState) => void;
+  noBorder?: boolean;
 }
 
-export function JobFilters({ filters, onChange }: JobFiltersProps) {
+export function JobFilters({ filters, onChange, noBorder = false }: JobFiltersProps) {
   function updateField(field: keyof JobFiltersState, value: string | boolean) {
     onChange({ ...filters, [field]: value });
   }
@@ -23,7 +24,7 @@ export function JobFilters({ filters, onChange }: JobFiltersProps) {
   return (
     <Stack
       spacing={2}
-      sx={{
+      sx={noBorder ? { p: 0 } : {
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
@@ -31,10 +32,12 @@ export function JobFilters({ filters, onChange }: JobFiltersProps) {
         p: 2,
       }}
     >
-      <Stack direction="row" spacing={1} alignItems="center">
-        <TuneIcon color="primary" />
-        <Typography variant="h4">Filters</Typography>
-      </Stack>
+      {!noBorder && (
+        <Stack direction="row" spacing={1} alignItems="center">
+          <TuneIcon color="primary" />
+          <Typography variant="h4">Filters</Typography>
+        </Stack>
+      )}
       <TextField
         label="Location"
         value={filters.location}
