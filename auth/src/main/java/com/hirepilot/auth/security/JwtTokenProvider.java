@@ -14,89 +14,79 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${app.jwt.secret}")
-    private String secretKey;
+        @Value("${app.jwt.secret}")
+        private String secretKey;
 
-    private SecretKey key;
+        private SecretKey key;
 
-    @PostConstruct
-    public void init() {
-        this.key = Keys.hmacShaKeyFor(
-                secretKey.getBytes()
-        );
-    }
-
-    public String generateToken(
-            Long userId,
-            String email,
-            String role
-    ) {
-
-        return Jwts.builder()
-                .subject(email)
-
-
-                .claim("userId", userId)
-                .claim("role", role)
-
-                .issuedAt(new Date())
-
-                .expiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + 604800000L // 1 week
-                        )
-                )
-
-                .signWith(key)
-                .compact();
-    }
-
-    private Claims getClaims(
-            String token
-    ) {
-
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    public String getEmailFromToken(
-            String token
-    ) {
-        return getClaims(token)
-                .getSubject();
-    }
-
-    public Long getUserId(
-            String token
-    ) {
-        return getClaims(token)
-                .get("userId", Long.class);
-    }
-
-    public String getRole(
-            String token
-    ) {
-        return getClaims(token)
-                .get("role", String.class);
-    }
-
-    public boolean validateToken(
-            String token
-    ) {
-
-        try {
-
-            getClaims(token);
-
-            return true;
-
-        } catch (Exception ex) {
-
-            return false;
+        @PostConstruct
+        public void init() {
+                this.key = Keys.hmacShaKeyFor(
+                                secretKey.getBytes());
         }
-    }
+
+        public String generateToken(
+                        Long userId,
+                        String email,
+                        String role) {
+
+                return Jwts.builder()
+                                .subject(email)
+
+                                .claim("userId", userId)
+                                .claim("role", role)
+
+                                .issuedAt(new Date())
+
+                                .expiration(
+                                                new Date(
+                                                                System.currentTimeMillis()
+                                                                                + 604800000L // 1 week
+                                                ))
+
+                                .signWith(key)
+                                .compact();
+        }
+
+        private Claims getClaims(
+                        String token) {
+
+                return Jwts.parser()
+                                .verifyWith(key)
+                                .build()
+                                .parseSignedClaims(token)
+                                .getPayload();
+        }
+
+        public String getEmailFromToken(
+                        String token) {
+                return getClaims(token)
+                                .getSubject();
+        }
+
+        public Long getUserId(String token) {
+                Number userId = getClaims(token).get("userId", Number.class);
+                return userId != null ? userId.longValue() : null;
+        }
+
+        public String getRole(
+                        String token) {
+                return getClaims(token)
+                                .get("role", String.class);
+        }
+
+        public boolean validateToken(
+                        String token) {
+
+                try {
+
+                        getClaims(token);
+
+                        return true;
+
+                } catch (Exception ex) {
+
+                        return false;
+                }
+        }
 }
