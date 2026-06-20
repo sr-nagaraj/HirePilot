@@ -102,7 +102,7 @@ export const ResumeScorePage: React.FC = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: 1100, mx: 'auto', p: { xs: 1, md: 3 }, width: '100%', overflow: 'hidden' }}>
+        <Box sx={{ maxWidth: 1100, mx: 'auto', p: { xs: 1.5, md: 3 }, width: '100%' }}>
             {/* Header section */}
             <Stack spacing={0.5} sx={{ mb: 4 }}>
                 <Typography variant="h1" sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' }, fontWeight: 800 }}>
@@ -181,7 +181,7 @@ export const ResumeScorePage: React.FC = () => {
                     {/* Results Control Toolbar */}
                     <Card variant="outlined" sx={{ borderRadius: 3 }}>
                         <CardContent sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 1 }}>
                                 <Typography variant="h4" fontWeight={700}>
                                     Analysis Results
                                 </Typography>
@@ -226,7 +226,7 @@ export const ResumeScorePage: React.FC = () => {
                     {/* Main Dashboard Details Split Panels */}
                     <Grid container spacing={{ xs: 2, md: 3 }}>
                         {/* Left Side: Score & Breakdown */}
-                        <Grid size={{ xs: 12, md: 4.5 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                             <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>
                                 <CardContent sx={{ p: { xs: 2, sm: 3, md: 3.5 } }}>
                                     <Stack spacing={3.5}>
@@ -252,7 +252,7 @@ export const ResumeScorePage: React.FC = () => {
                         </Grid>
 
                         {/* Right Side: Key Findings */}
-                        <Grid size={{ xs: 12, md: 7.5 }}>
+                        <Grid size={{ xs: 12, md: 8 }}>
                             <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>
                                 <CardContent sx={{ p: { xs: 2, sm: 3, md: 3.5 } }}>
                                     <Stack spacing={4}>

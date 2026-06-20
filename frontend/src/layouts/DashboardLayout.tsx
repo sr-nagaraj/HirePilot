@@ -174,6 +174,7 @@ export function DashboardLayout() {
           marginLeft: { md: `${SIDEBAR_WIDTH}px` },
           display: "flex",
           flexDirection: "column",
+          minWidth: 0,
         }}
       >
         {/* Sticky Top Bar */}
@@ -270,6 +271,7 @@ export function DashboardLayout() {
             flexGrow: 1,
             py: { xs: 3, md: 4 },
             px: { xs: 2, sm: 3, md: 4 },
+            minWidth: 0,
           }}
         >
           <Outlet />
