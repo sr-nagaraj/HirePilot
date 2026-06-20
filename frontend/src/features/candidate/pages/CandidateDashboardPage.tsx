@@ -37,7 +37,7 @@ import { DashboardSkeleton } from "../../../shared/components/DashboardSkeleton"
 import { formatDate, formatCurrency } from "../../../shared/utils/formatters";
 import { useCandidateDashboardQuery } from "../hooks/useCandidateDashboardQuery";
 import { useProfileQuery } from "../../profile/hooks/useProfileQuery";
-import { getJobDetailsPath } from "../../../shared/constants/routes";
+import { getJobDetailsPath, ROUTES } from "../../../shared/constants/routes";
 
 export function CandidateDashboardPage() {
   const theme = useTheme();
@@ -139,7 +139,7 @@ export function CandidateDashboardPage() {
                 <Typography variant="h3" fontWeight={700}>
                   Recommended Jobs for You
                 </Typography>
-                <Button component={Link} to="/jobs" variant="text" size="small" endIcon={<ArrowForwardIcon />}>
+                <Button component={Link} to={ROUTES.CANDIDATE_JOBS} variant="text" size="small" endIcon={<ArrowForwardIcon />}>
                   Explore Jobs
                 </Button>
               </Stack>
@@ -171,13 +171,7 @@ export function CandidateDashboardPage() {
                         >
                           <CardContent sx={{ p: 3, display: "flex", flexDirection: "column", gap: 2 }}>
                             {/* Match & Bookmark */}
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                              <Chip
-                                label={`${matchPercent}% Match`}
-                                size="small"
-                                color="success"
-                                sx={{ fontWeight: 700, fontSize: "0.75rem" }}
-                              />
+                            <Stack direction="row" justifyContent="flex-end" alignItems="center">
                               <IconButton size="small" color="inherit">
                                 <BookmarkBorderIcon sx={{ fontSize: 20 }} />
                               </IconButton>

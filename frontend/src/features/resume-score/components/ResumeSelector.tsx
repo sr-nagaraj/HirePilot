@@ -31,26 +31,60 @@ export const ResumeSelector: React.FC<Props> = ({ resumes, loading, value, onCha
     }
 
     return (
-        <FormControl fullWidth>
+        <FormControl fullWidth sx={{ minWidth: 0 }}>
             <InputLabel id="resume-selector-label">Select Resume for Analysis</InputLabel>
             <Select
                 labelId="resume-selector-label"
                 value={value}
                 label="Select Resume for Analysis"
                 onChange={(e) => onChange(Number(e.target.value))}
+                renderValue={(selected) => {
+                    const resume = resumes.find(r => r.id === selected);
+                    return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 0, width: '100%' }}>
+                            <InsertDriveFileIcon fontSize="small" color="primary" sx={{ flexShrink: 0 }} />
+                            <Typography
+                                variant="body2"
+                                noWrap
+                                sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    minWidth: 0,
+                                    flexGrow: 1,
+                                    flexShrink: 1,
+                                }}
+                            >
+                                {resume?.fileName || ''}
+                            </Typography>
+                        </Box>
+                    );
+                }}
                 sx={{
                     borderRadius: 2,
                     '& .MuiSelect-select': {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 1.5,
+                        minWidth: 0,
                     }
                 }}
             >
                 {resumes.map((r) => (
-                    <MenuItem key={r.id} value={r.id} sx={{ gap: 1.5 }}>
-                        <InsertDriveFileIcon fontSize="small" color="primary" />
-                        {r.fileName}
+                    <MenuItem key={r.id} value={r.id} sx={{ gap: 1.5, minWidth: 0, maxWidth: '100%' }}>
+                        <InsertDriveFileIcon fontSize="small" color="primary" sx={{ flexShrink: 0 }} />
+                        <Typography
+                            variant="body2"
+                            noWrap
+                            sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                minWidth: 0,
+                                flexGrow: 1,
+                                flexShrink: 1,
+                            }}
+                        >
+                            {r.fileName}
+                        </Typography>
                     </MenuItem>
                 ))}
             </Select>

@@ -105,7 +105,7 @@ export const ResumeScorePage: React.FC = () => {
         <Box sx={{ maxWidth: 1100, mx: 'auto', p: { xs: 1, md: 3 } }}>
             {/* Header section */}
             <Stack spacing={0.5} sx={{ mb: 4 }}>
-                <Typography variant="h1" sx={{ fontWeight: 800 }}>
+                <Typography variant="h1" sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' }, fontWeight: 800 }}>
                     AI Resume ATS Score
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
@@ -115,7 +115,7 @@ export const ResumeScorePage: React.FC = () => {
 
             {/* Input Form Card */}
             <Card variant="outlined" sx={{ mb: 4, borderRadius: 3 }}>
-                <CardContent sx={{ p: 3.5 }}>
+                <CardContent sx={{ p: { xs: 2, sm: 3, md: 3.5 } }}>
                     <Stack spacing={3}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                             <PsychologyIcon color="primary" sx={{ fontSize: 24 }} />
@@ -228,7 +228,7 @@ export const ResumeScorePage: React.FC = () => {
                         {/* Left Side: Score & Breakdown */}
                         <Grid size={{ xs: 12, md: 4.5 }}>
                             <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>
-                                <CardContent sx={{ p: 3.5 }}>
+                                <CardContent sx={{ p: { xs: 2, sm: 3, md: 3.5 } }}>
                                     <Stack spacing={3.5}>
                                         <RecommendationBanner recommendation={displayResult.recommendation} />
                                         <Box sx={{ py: 1 }}>
@@ -254,7 +254,7 @@ export const ResumeScorePage: React.FC = () => {
                         {/* Right Side: Key Findings */}
                         <Grid size={{ xs: 12, md: 7.5 }}>
                             <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>
-                                <CardContent sx={{ p: 3.5 }}>
+                                <CardContent sx={{ p: { xs: 2, sm: 3, md: 3.5 } }}>
                                     <Stack spacing={4}>
                                         <Strengths strengths={displayResult.strengths} />
                                         

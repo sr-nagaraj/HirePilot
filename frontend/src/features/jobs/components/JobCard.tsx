@@ -88,12 +88,6 @@ export function JobCard({ job, onApply, isApplied = false }: JobCardProps) {
           </Stack>
 
           <Stack direction="row" spacing={0.5} alignItems="center">
-            <Chip
-              label={`${matchPercent}% Match`}
-              size="small"
-              color="success"
-              sx={{ fontWeight: 700, fontSize: "0.75rem", height: 22 }}
-            />
             <IconButton size="small" onClick={() => setBookmarked(!bookmarked)} color="inherit">
               {bookmarked ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
             </IconButton>
