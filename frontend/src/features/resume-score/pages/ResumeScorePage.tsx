@@ -102,7 +102,7 @@ export const ResumeScorePage: React.FC = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: 1100, mx: 'auto', p: { xs: 1, md: 3 } }}>
+        <Box sx={{ maxWidth: 1100, mx: 'auto', p: { xs: 1, md: 3 }, width: '100%', overflow: 'hidden' }}>
             {/* Header section */}
             <Stack spacing={0.5} sx={{ mb: 4 }}>
                 <Typography variant="h1" sx={{ fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.5rem' }, fontWeight: 800 }}>
@@ -224,7 +224,7 @@ export const ResumeScorePage: React.FC = () => {
                     </Card>
 
                     {/* Main Dashboard Details Split Panels */}
-                    <Grid container spacing={3}>
+                    <Grid container spacing={{ xs: 2, md: 3 }}>
                         {/* Left Side: Score & Breakdown */}
                         <Grid size={{ xs: 12, md: 4.5 }}>
                             <Card variant="outlined" sx={{ borderRadius: 3, height: '100%' }}>

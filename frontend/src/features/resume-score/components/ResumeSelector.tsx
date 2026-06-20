@@ -12,6 +12,13 @@ interface Props {
     onChange: (id: number) => void;
 }
 
+function getResumeDisplayName(fileName: string) {
+    return fileName.replace(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_/i,
+        "",
+    );
+}
+
 export const ResumeSelector: React.FC<Props> = ({ resumes, loading, value, onChange }) => {
     if (loading) {
         return (
@@ -31,7 +38,7 @@ export const ResumeSelector: React.FC<Props> = ({ resumes, loading, value, onCha
     }
 
     return (
-        <FormControl fullWidth sx={{ minWidth: 0 }}>
+        <FormControl fullWidth sx={{ minWidth: 0, maxWidth: '100%' }}>
             <InputLabel id="resume-selector-label">Select Resume for Analysis</InputLabel>
             <Select
                 labelId="resume-selector-label"
@@ -54,18 +61,21 @@ export const ResumeSelector: React.FC<Props> = ({ resumes, loading, value, onCha
                                     flexShrink: 1,
                                 }}
                             >
-                                {resume?.fileName || ''}
+                                {getResumeDisplayName(resume?.fileName || '')}
                             </Typography>
                         </Box>
                     );
                 }}
                 sx={{
                     borderRadius: 2,
+                    maxWidth: '100%',
+                    minWidth: 0,
                     '& .MuiSelect-select': {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 1.5,
                         minWidth: 0,
+                        overflow: 'hidden',
                     }
                 }}
             >
@@ -83,7 +93,7 @@ export const ResumeSelector: React.FC<Props> = ({ resumes, loading, value, onCha
                                 flexShrink: 1,
                             }}
                         >
-                            {r.fileName}
+                            {getResumeDisplayName(r.fileName)}
                         </Typography>
                     </MenuItem>
                 ))}
