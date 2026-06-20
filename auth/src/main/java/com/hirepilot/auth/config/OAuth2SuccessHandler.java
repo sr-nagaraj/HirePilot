@@ -32,7 +32,6 @@ public class OAuth2SuccessHandler
 
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
-
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
@@ -40,33 +39,50 @@ public class OAuth2SuccessHandler
             Authentication authentication
     ) throws IOException {
 
-        OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
-        String email = oauthUser.getAttribute("email");
-        String name = oauthUser.getAttribute("name");
+        try {
+            OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+            String email = oauthUser.getAttribute("email");
+            String name  = oauthUser.getAttribute("name");
 
-        Optional<User> existingUser = userRepository.findByEmail(email);
+            // Null safety
+            if (email == null) {
+                response.sendRedirect(frontendUrl + "/oauth-success?error=oauth");
+                return;
+            }
 
-        if (existingUser.isPresent()) {
-            // Returning user -> generate JWT -> login directly
-            User user = existingUser.get();
-            String token = jwtTokenProvider.generateToken(
-                    user.getId(),
-                    user.getEmail(),
-                    user.getRole().name()
-            );
+            String safeName = (name != null)
+                    ? URLEncoder.encode(name, StandardCharsets.UTF_8)
+                    : "";
 
-            response.sendRedirect(
-                    frontendUrl + "/oauth-success"
-                            + "?token=" + token
-                            + "&role=" + user.getRole().name()
-            );
-        } else {
-            // New user -> redirect to role selection screen
-            response.sendRedirect(
-                    frontendUrl + "/oauth-role-selection"
-                            + "?email=" + email
-                            + "&name=" + URLEncoder.encode(name != null ? name : "User", StandardCharsets.UTF_8)
-            );
+            Optional<User> existingUser = userRepository.findByEmail(email);
+
+            if (existingUser.isPresent()) {
+                // Returning user → JWT → dashboard
+                User user = existingUser.get();
+                String token = jwtTokenProvider.generateToken(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getRole().name()
+                );
+                response.sendRedirect(
+                        frontendUrl + "/oauth-success"
+                                + "?token=" + token
+                                + "&role=" + user.getRole().name()
+                );
+            } else {
+                // New user → role selection
+                response.sendRedirect(
+                        frontendUrl + "/oauth-role-selection"
+                                + "?email=" + email
+                                + "&name=" + safeName
+                );
+            }
+
+        } catch (Exception e) {
+            // Log and redirect to failure — never show Whitelabel
+            System.err.println("OAuth2 success handler error: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect(frontendUrl + "/login?error=oauth_error");
         }
     }
 }

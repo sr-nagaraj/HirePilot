@@ -1,6 +1,5 @@
 package com.hirepilot.apigateway.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -13,8 +12,7 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
 
-        CorsConfiguration config =
-                new CorsConfiguration();
+        CorsConfiguration config = new CorsConfiguration();
 
         // Frontend URLs
         String allowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
@@ -36,13 +34,11 @@ public class CorsConfig {
         // Allow cookies/auth headers
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration(
                 "/**",
-                config
-        );
+                config);
 
         return new CorsFilter(source);
     }

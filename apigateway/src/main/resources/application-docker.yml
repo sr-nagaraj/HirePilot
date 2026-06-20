@@ -23,6 +23,20 @@ spring:
               predicates:
                 - Path=/oauth2/**
 
+            - id: oauth2-route
+              uri: http://auth-service:8081
+              predicates:
+                - Path=/oauth2/**
+              filters:
+                - PreserveHostHeader
+
+            - id: login-route
+              uri: http://auth-service:8081
+              predicates:
+                - Path=/login/oauth2/**
+              filters:
+                - PreserveHostHeader
+
             - id: login-route
               uri: http://auth-service:8081
               predicates:
