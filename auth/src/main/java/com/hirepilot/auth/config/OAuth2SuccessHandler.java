@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -26,14 +27,11 @@ public class OAuth2SuccessHandler
         extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
-
     private final JwtTokenProvider jwtTokenProvider;
-
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
-
 
     @Override
     public void onAuthenticationSuccess(
@@ -42,20 +40,33 @@ public class OAuth2SuccessHandler
             Authentication authentication
     ) throws IOException {
 
-        OAuth2User oauthUser =
-                (OAuth2User)
-                        authentication.getPrincipal();
+        OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
+        String email = oauthUser.getAttribute("email");
+        String name = oauthUser.getAttribute("name");
 
-        String email =
-                oauthUser.getAttribute("email");
+        Optional<User> existingUser = userRepository.findByEmail(email);
 
-        String name =
-                oauthUser.getAttribute("name");
+        if (existingUser.isPresent()) {
+            // Returning user -> generate JWT -> login directly
+            User user = existingUser.get();
+            String token = jwtTokenProvider.generateToken(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getRole().name()
+            );
 
-        response.sendRedirect(
-                frontendUrl + "/oauth-role-selection"
-                        + "?email=" + email
-                        + "&name=" + URLEncoder.encode(name, StandardCharsets.UTF_8)
-        );
+            response.sendRedirect(
+                    frontendUrl + "/oauth-success"
+                            + "?token=" + token
+                            + "&role=" + user.getRole().name()
+            );
+        } else {
+            // New user -> redirect to role selection screen
+            response.sendRedirect(
+                    frontendUrl + "/oauth-role-selection"
+                            + "?email=" + email
+                            + "&name=" + URLEncoder.encode(name != null ? name : "User", StandardCharsets.UTF_8)
+            );
+        }
     }
 }
