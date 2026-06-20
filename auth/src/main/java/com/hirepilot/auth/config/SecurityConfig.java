@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -24,6 +25,9 @@ public class SecurityConfig {
 
     private final OAuth2SuccessHandler
             oAuth2SuccessHandler;
+
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
 
 
 
@@ -56,7 +60,7 @@ public class SecurityConfig {
                                         oAuth2SuccessHandler
                                 )
                                 .failureUrl(
-                                        "http://localhost:5173/oauth-success?error=oauth"
+                                        frontendUrl + "/oauth-success?error=oauth"
                                 )
                 )
 

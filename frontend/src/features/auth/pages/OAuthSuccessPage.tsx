@@ -12,7 +12,7 @@ export function OAuthSuccessPage() {
     const email = searchParams.get("email");
 
     if (!email) {
-      navigate(ROUTES.LOGIN, { replace: true });
+      navigate(`${ROUTES.LOGIN}?expired=true`, { replace: true });
       return;
     }
 
