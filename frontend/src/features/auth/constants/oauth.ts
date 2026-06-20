@@ -1,6 +1,10 @@
 import { API_BASE_URL } from "../../../shared/constants/app";
 
-export const GOOGLE_OAUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
+const OAUTH_BASE_URL = import.meta.env.DEV
+  ? API_BASE_URL
+  : (import.meta.env.VITE_OAUTH_BASE_URL?.trim() || window.location.origin);
+
+export const GOOGLE_OAUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/google`;
 
 export const OAUTH_FLOW_STORAGE_KEY = "hirepilot.oauthFlow";
 
